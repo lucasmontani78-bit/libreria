@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librería Digital & Lector E-Book</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        sepia: {
+                            50: '#fbf0d9',
+                            100: '#f7e4be',
+                            800: '#5f4b32',
+                            900: '#2c2217',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        .font-sans-app { font-family: 'Inter', sans-serif; }
+        .font-serif-lora { font-family: 'Lora', serif; }
+        .font-serif-merriweather { font-family: 'Merriweather', serif; }
+        .font-mono-reader { font-family: 'Roboto Mono', monospace; }
+        
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.8); }
+
+        .sepia-mode {
+            background-color: #fbf0d9 !important;
+            color: #2c2217 !important;
+        }
+        .sepia-mode .reader-card {
+            background-color: #f4e3c1 !important;
+            border-color: #e2cca1 !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 font-sans-app h-full flex flex-col transition-colors duration-200">
+
+    <!-- TOP NAVIGATION -->
+    <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Brand / Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('library')">
+                    <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-md">
+                        <i class="fa-solid fa-book-open text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">LuminaBooks</span>
+                        <span class="text-xs block text-gray-500 dark:text-gray-400 font-medium">Biblioteca & Reader Pro</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-2">
+                    <button id="nav-library" onclick="switchTab('library')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400">
+                        <i class="fa-solid fa-layer-group mr-2"></i>Biblioteca
+                    </button>
+                    <button id="nav-upload" onclick="switchTab('upload')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Cargar Libro
+                    </button>
+                    <button id="nav-architecture" onclick="switchTab('architecture')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                        <i class="fa-solid fa-code-branch mr-2"></i>Guía de Arquitectura
+                    </button>
+                </nav>
+
+                <!-- Actions -->
+                <div class="flex items-center space-x-3">
+                    <button onclick="toggleDarkMode()" class="p-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                        <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                    </button>
+                    <button onclick="switchTab('upload')" class="hidden sm:inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-medium text-sm shadow-md transition-all">
+                        <i class="fa-solid fa-plus mr-2"></i> Nuevo Libro
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Navigation bar -->
+        <div class="md:hidden flex border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 justify-around">
+            <button onclick="switchTab('library')" class="flex-1 py-2 text-center text-xs font-medium text-indigo-600">
+                <i class="fa-solid fa-layer-group block text-base mb-0.5"></i>Biblioteca
+            </button>
+            <button onclick="switchTab('upload')" class="flex-1 py-2 text-center text-xs font-medium text-gray-500">
+                <i class="fa-solid fa-cloud-arrow-up block text-base mb-0.5"></i>Cargar
+            </button>
+            <button onclick="switchTab('architecture')" class="flex-1 py-2 text-center text-xs font-medium text-gray-500">
+                <i class="fa-solid fa-code-branch block text-base mb-0.5"></i>Arquitectura
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 overflow-y-auto">
+
+        <!-- VIEW 1: LIBRARY & DASHBOARD -->
+        <section id="view-library" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Hero / Banner -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white p-6 sm:p-10 mb-8 shadow-xl">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold">Lector Web Pro</span>
+                    <h1 class="text-2xl sm:text-4xl font-bold mt-3 mb-2">Tu Biblioteca Cloud sin límites</h1>
+                    <p class="text-indigo-200 text-sm sm:text-base">Sube tus propios libros en TXT, HTML o PDF, gestiona tus capítulos y lee cómodamente con personalización total de lectura.</p>
+                </div>
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl pointer-events-none">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="flex flex-col md:flex-row gap-4 mb-8 justify-between items-stretch md:items-center bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200/80 dark:border-gray-700">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="search-input" oninput="renderLibrary()" placeholder="Buscar por título, autor o palabras clave..." class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                
+                <div class="flex flex-wrap gap-3 items-center">
+                    <select id="genre-filter" onchange="renderLibrary()" class="px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="all">Todos los Géneros</option>
+                        <option value="Ficción">Ficción</option>
+                        <option value="Clásico">Clásico</option>
+                        <option value="Terror">Terror</option>
+                        <option value="Ensayo">Ensayo</option>
+                        <option value="Filosofía">Filosofía</option>
+                    </select>
+
+                    <select id="sort-filter" onchange="renderLibrary()" class="px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="recent">Más recientes</option>
+                        <option value="title">Por Título (A-Z)</option>
+                        <option value="author">Por Autor</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Books Grid -->
+            <div id="books-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                <!-- Book Cards will be injected dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 my-8">
+                <i class="fa-solid fa-book-open text-5xl text-gray-400 mb-4"></i>
+                <h3 class="text-lg font-semibold mb-1">No se encontraron libros</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">Intenta cambiar los términos de búsqueda o sube un nuevo título.</p>
+                <button onclick="switchTab('upload')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Subir un libro ahora</button>
+            </div>
+        </section>
+
+        <!-- VIEW 2: FULLSCREEN E-READER MODE -->
+        <section id="view-reader" class="hidden fixed inset-0 z-50 bg-white dark:bg-gray-900 flex flex-col overflow-hidden transition-colors duration-200">
+            <!-- Reader Top Bar -->
+            <header class="reader-card bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between shrink-0 z-10 shadow-sm">
+                <div class="flex items-center space-x-3">
+                    <button onclick="closeReader()" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all" title="Volver a la Biblioteca">
+                        <i class="fa-solid fa-arrow-left text-lg"></i>
+                    </button>
+                    <div>
+                        <h2 id="reader-book-title" class="font-bold text-sm sm:text-base line-clamp-1">Título del Libro</h2>
+                        <span id="reader-book-author" class="text-xs text-gray-500 dark:text-gray-400 block">Autor</span>
+                    </div>
+                </div>
+
+                <!-- Reader Toolbar Controls -->
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <!-- TOC / Index Button -->
+                    <button onclick="toggleTocMenu()" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="Índice de Capítulos">
+                        <i class="fa-solid fa-list text-lg"></i>
+                    </button>
+                    
+                    <!-- Bookmarks Toggle -->
+                    <button onclick="toggleBookmarksMenu()" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg relative" title="Marcadores y Notas">
+                        <i class="fa-solid fa-bookmark text-lg"></i>
+                        <span id="bookmark-indicator" class="hidden absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full"></span>
+                    </button>
+
+                    <!-- Appearance Settings Dropdown Toggle -->
+                    <button onclick="toggleSettingsMenu()" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="Ajustes de Lectura">
+                        <i class="fa-solid fa-font text-lg"></i>
+                    </button>
+
+                    <!-- Quick Bookmark Current Page -->
+                    <button onclick="addCurrentBookmark()" class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition-all flex items-center space-x-1">
+                        <i class="fa-regular fa-bookmark"></i>
+                        <span class="hidden sm:inline">Marcar</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Reader Main Content Container -->
+            <div class="flex-1 flex overflow-hidden relative">
+                
+                <!-- Table of Contents Sidebar -->
+                <aside id="toc-sidebar" class="hidden absolute left-0 top-0 bottom-0 w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-20 shadow-2xl flex flex-col p-4">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="font-bold text-base"><i class="fa-solid fa-list-ol mr-2 text-indigo-500"></i>Capítulos</h3>
+                        <button onclick="toggleTocMenu()" class="text-gray-400 hover:text-gray-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div id="toc-list" class="flex-1 overflow-y-auto space-y-1">
+                        <!-- Chapter links injected dynamically -->
+                    </div>
+                </aside>
+
+                <!-- Bookmarks & Notes Sidebar -->
+                <aside id="bookmarks-sidebar" class="hidden absolute right-0 top-0 bottom-0 w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 z-20 shadow-2xl flex flex-col p-4">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="font-bold text-base"><i class="fa-solid fa-bookmark mr-2 text-indigo-500"></i>Marcadores & Notas</h3>
+                        <button onclick="toggleBookmarksMenu()" class="text-gray-400 hover:text-gray-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    
+                    <!-- Add Note Input -->
+                    <div class="mb-4">
+                        <textarea id="new-note-text" rows="2" placeholder="Escribe una nota o comentario aquí..." class="w-full text-xs p-2.5 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:ring-1 focus:ring-indigo-500"></textarea>
+                        <button onclick="saveNote()" class="mt-1 w-full bg-indigo-600 text-white text-xs py-1.5 rounded-lg font-medium hover:bg-indigo-700">Guardar Nota</button>
+                    </div>
+
+                    <div id="bookmarks-list" class="flex-1 overflow-y-auto space-y-2">
+                        <!-- Bookmarks injected here -->
+                    </div>
+                </aside>
+
+                <!-- Reader Settings Panel Popup -->
+                <div id="settings-popup" class="hidden absolute top-3 right-4 w-72 sm:w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-5 z-20 space-y-4">
+                    <div class="flex justify-between items-center border-b pb-2 dark:border-gray-700">
+                        <h4 class="font-bold text-sm">Personalizar Lector</h4>
+                        <button onclick="toggleSettingsMenu()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    
+                    <!-- Color Themes -->
+                    <div>
+                        <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-2">Tema de color</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setReaderTheme('light')" class="py-2 text-xs font-medium border rounded-lg bg-white text-gray-900 border-gray-300">Claro</button>
+                            <button onclick="setReaderTheme('sepia')" class="py-2 text-xs font-medium border rounded-lg bg-[#fbf0d9] text-[#2c2217] border-[#e2cca1]">Sepia</button>
+                            <button onclick="setReaderTheme('dark')" class="py-2 text-xs font-medium border rounded-lg bg-gray-900 text-white border-gray-700">Oscuro</button>
+                        </div>
+                    </div>
+
+                    <!-- Font Family -->
+                    <div>
+                        <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-2">Tipografía</label>
+                        <select id="reader-font-family" onchange="updateReaderStyles()" class="w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700">
+                            <option value="font-serif-lora">Lora (Serif)</option>
+                            <option value="font-serif-merriweather">Merriweather (Editorial)</option>
+                            <option value="font-sans-app">Inter (Sans-serif)</option>
+                            <option value="font-mono-reader">Roboto Mono</option>
+                        </select>
+                    </div>
+
+                    <!-- Font Size Controls -->
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                            <span>Tamaño de Letra</span>
+                            <span id="font-size-label">18px</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="changeFontSize(-2)" class="px-3 py-1 rounded bg-gray-100 dark:bg-gray-700 font-bold">-</button>
+                            <input type="range" id="font-size-slider" min="14" max="28" step="1" value="18" oninput="onFontSizeSliderChange(this.value)" class="w-full">
+                            <button onclick="changeFontSize(2)" class="px-3 py-1 rounded bg-gray-100 dark:bg-gray-700 font-bold">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Line Height / Margins -->
+                    <div>
+                        <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-2">Ancho del Texto / Margen</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setMarginSize('narrow')" class="py-1 text-xs border rounded dark:border-gray-600">Estrecho</button>
+                            <button onclick="setMarginSize('normal')" class="py-1 text-xs border rounded dark:border-gray-600 bg-indigo-50 dark:bg-indigo-900/30">Normal</button>
+                            <button onclick="setMarginSize('wide')" class="py-1 text-xs border rounded dark:border-gray-600">Amplio</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actual Reading Area (Text Content Viewport) -->
+                <div id="reader-viewport" class="flex-1 overflow-y-auto px-4 py-8 flex justify-center">
+                    <div id="reader-content-box" class="w-full max-w-3xl transition-all duration-150 leading-relaxed font-serif-lora text-lg select-text">
+                        <!-- Content render here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reader Bottom Controls & Progress Bar -->
+            <footer class="reader-card bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0 z-10">
+                <!-- Navigation Prev/Next -->
+                <div class="flex items-center space-x-2 order-2 sm:order-1">
+                    <button onclick="navigateChapter(-1)" class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+                    </button>
+                    <span id="chapter-indicator" class="text-xs font-medium px-2 text-gray-500 dark:text-gray-400">Cap. 1 de 1</span>
+                    <button onclick="navigateChapter(1)" class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700">
+                        Siguiente <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+
+                <!-- Reading Progress Bar -->
+                <div class="w-full sm:w-1/2 flex items-center space-x-3 order-1 sm:order-2">
+                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+                        <div id="reading-progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                    <span id="reading-progress-text" class="text-xs font-mono text-gray-500 dark:text-gray-400 w-12 text-right">0%</span>
+                </div>
+            </footer>
+        </section>
+
+        <!-- VIEW 3: UPLOAD BOOK FORM -->
+        <section id="view-upload" class="hidden max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 sm:p-10">
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-5 mb-6">
+                    <h2 class="text-2xl font-bold">Cargar Nuevo Libro a la Plataforma</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Sube archivos en formato TXT, HTML/EPUB básico o escribe el contenido directamente.</p>
+                </div>
+
+                <form id="upload-form" onsubmit="handleBookUpload(event)" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Título del Libro *</label>
+                            <input type="text" id="upload-title" required placeholder="Ej: La Metamorfosis" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Autor *</label>
+                            <input type="text" id="upload-author" required placeholder="Ej: Franz Kafka" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Género / Categoría</label>
+                            <select id="upload-genre" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <option value="Ficción">Ficción</option>
+                                <option value="Clásico">Clásico</option>
+                                <option value="Terror">Terror</option>
+                                <option value="Ensayo">Ensayo</option>
+                                <option value="Filosofía">Filosofía</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">URL Portada de Libro (Opcional)</label>
+                            <input type="url" id="upload-cover" placeholder="https://ejemplo.com/portada.jpg" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Sinopsis o Descripción Corta</label>
+                        <textarea id="upload-description" rows="2" placeholder="Breve resumen de la obra..." class="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <!-- Content Upload Options -->
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <label class="block text-sm font-semibold mb-2">Contenido del Libro *</label>
+                        
+                        <!-- Tabs for File vs Text -->
+                        <div class="flex space-x-3 mb-4">
+                            <button type="button" id="tab-btn-file" onclick="setUploadSource('file')" class="px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white">Subir Archivo (.txt / .html)</button>
+                            <button type="button" id="tab-btn-text" onclick="setUploadSource('text')" class="px-4 py-2 rounded-lg text-xs font-semibold bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300">Pegar Texto Directo</button>
+                        </div>
+
+                        <!-- File Input Box -->
+                        <div id="source-file-container" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-indigo-500 transition-colors">
+                            <i class="fa-solid fa-file-arrow-up text-4xl text-indigo-500 mb-3"></i>
+                            <p class="text-sm font-medium mb-1">Haz clic para seleccionar o arrastra tu archivo aquí</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Formatos soportados: .txt, .html, .epub simple</p>
+                            <input type="file" id="file-input" accept=".txt,.html,.htm,.md" onchange="handleFileSelect(event)" class="hidden">
+                            <button type="button" onclick="document.getElementById('file-input').click()" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-lg text-xs font-bold border border-indigo-200 dark:border-indigo-800">
+                                Explorar Archivos
+                            </button>
+                            <p id="file-name-display" class="mt-3 text-xs font-semibold text-emerald-600 dark:text-emerald-400"></p>
+                        </div>
+
+                        <!-- Direct Text Box -->
+                        <div id="source-text-container" class="hidden">
+                            <textarea id="raw-content-input" rows="10" placeholder="Pega aquí los capítulos o el texto completo del libro. Usa 'Capítulo 1', 'Capítulo 2' para auto-separar..." class="w-full p-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm font-serif-lora focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="switchTab('library')" class="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-700">Cancelar</button>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-lg transition-all">
+                            <i class="fa-solid fa-check mr-2"></i>Guardar e Incluir en Biblioteca
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW 4: ARCHITECTURE & TECHNICAL GUIDE -->
+        <section id="view-architecture" class="hidden max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 sm:p-10 space-y-8">
+                <div>
+                    <span class="text-xs uppercase font-bold tracking-wider text-indigo-600 dark:text-indigo-400">Guía para Desarrolladores</span>
+                    <h2 class="text-3xl font-extrabold mt-1">Cómo Construir un Sistema Completo de Lectura Digital</h2>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm mt-2">Esta guía explica la arquitectura idónea para escalar este prototipo a un SaaS o plataforma de libros digitales de grado producción.</p>
+                </div>
+
+                <!-- Grid of Architecture Pillars -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Pillar 1 -->
+                    <div class="p-5 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2.5 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                <i class="fa-solid fa-server text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-base">1. Backend & Procesamiento</h3>
+                        </div>
+                        <ul class="text-xs text-gray-600 dark:text-gray-300 space-y-2 list-disc list-inside">
+                            <li><strong>Node.js / Python FastApi:</strong> Para autenticación, gestión de suscripciones y procesamiento asíncrono de libros.</li>
+                            <li><strong>Parser Pipeline:</strong> Al subir un `.epub` o `.pdf`, un Worker en segundo plano (BullMQ/Celery) debe desempaquetar las imágenes y extraer la estructura HTML/TOC para lectura fluida.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pillar 2 -->
+                    <div class="p-5 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2.5 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-base">2. Almacenamiento & CDN</h3>
+                        </div>
+                        <ul class="text-xs text-gray-600 dark:text-gray-300 space-y-2 list-disc list-inside">
+                            <li><strong>S3 / Supabase Storage / Cloudinary:</strong> Almacenamiento distribuido para los binarios pesados (EPUB, PDF, audiolibros).</li>
+                            <li><strong>Protección de Contenido (DRM Básico):</strong> URLs firmadas temporales para prevenir la descarga directa de archivos protegidos por derechos de autor.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pillar 3 -->
+                    <div class="p-5 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2.5 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                <i class="fa-solid fa-mobile-screen text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-base">3. Renderizado Frontend & Librerías</h3>
+                        </div>
+                        <ul class="text-xs text-gray-600 dark:text-gray-300 space-y-2 list-disc list-inside">
+                            <li><strong>EPUB.js:</strong> Estándar en la industria para renderizar archivos EPUB con paginación fluida en HTML5 Canvas/DOM.</li>
+                            <li><strong>PDF.js (Mozilla):</strong> Renderizador nativo en JavaScript para visualizar PDFs sin plugins externos.</li>
+                            <li><strong>Virtualización de Listas:</strong> Cargar capítulos sobredemandados (Lazy Loading) para evitar consumir memoria excesiva en teléfonos móviles.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pillar 4 -->
+                    <div class="p-5 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="bg-indigo-100 dark:bg-indigo-900/50 p-2.5 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                <i class="fa-solid fa-database text-xl"></i>
+                            </div>
+                            <h3 class="font-bold text-base">4. Persistencia de Lectura</h3>
+                        </div>
+                        <ul class="text-xs text-gray-600 dark:text-gray-300 space-y-2 list-disc list-inside">
+                            <li><strong>Sincronización Cloud:</strong> Guardar las métricas (página actual, porcentaje, notas, resaltados) en PostgreSQL / MongoDB.</li>
+                            <li><strong>Offline-First (PWA):</strong> Usar IndexedDB en el navegador para permitir lectura en modo avión sin conexión a internet.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Code Example Snippet -->
+                <div class="bg-gray-900 text-gray-200 p-5 rounded-xl overflow-x-auto text-xs font-mono">
+                    <p class="text-gray-400 mb-2">// Ejemplo de integración conceptual con EPUB.js en Frontend:</p>
+                    <pre><code class="text-indigo-300">import Book from "epubjs";
+
+const book = ePub("https://cdn.tu-libreria.com/libros/el-principito.epub");
+const rendition = book.renderTo("reader-viewport", {
+    width: "100%",
+    height: "100%",
+    spread: "always"
+});
+
+rendition.display(); // Carga y muestra el libro con paginación fluida</code></pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // Initial Sample Books Data
+        const SAMPLE_BOOKS = [
+            {
+                id: "book-1",
+                title: "El Principito",
+                author: "Antoine de Saint-Exupéry",
+                genre: "Clásico",
+                cover: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80",
+                description: "Una historia poética sobre la infancia, la amistad, el amor y el sentido de la vida.",
+                chapters: [
+                    {
+                        title: "Capítulo I: El dibujo de la boa",
+                        content: `<p class="mb-4">Pido perdón a los niños por haber dedicado este libro a una persona grande. Tengo una seria razón para ello: esta persona grande es el mejor amigo que tengo en el mundo.</p>
+                        <p class="mb-4">Cuando yo tenía seis años vi una vez una lámina magnífica en un libro sobre la selva virgen que se llamaba <em>Historias Vividas</em>. Representaba una serpiente boa que se tragaba a una fiera.</p>
+                        <p class="mb-4">Reflexioné mucho entonces sobre las aventuras de la selva y, a mi vez, logré trazar con un lápiz de color mi primer dibujo. Mi dibujo número 1. Era así: representaba un sombrero... pero en realidad era una boa digiriendo un elefante.</p>
+                        <p class="mb-4">Las personas grandes me aconsejaron que dejara a un lado los dibujos de serpientes boas abiertas o cerradas, y que me interesara un poco más por la geografía, la historia, el cálculo y la gramática. Fue así como a la edad de seis años abandoné una magnífica carrera de pintor.</p>`
+                    },
+                    {
+                        title: "Capítulo II: El encuentro en el desierto",
+                        content: `<p class="mb-4">Viví así, solo, sin nadie con quien hablar verdaderamente, hasta que tuve una avería en el desierto de Sahara, hace seis años. Algo se había roto en mi motor. Y como no llevaba conmigo ni mecánico ni pasajeros, me dispuse a realizar, solo, una difícil reparación.</p>
+                        <p class="mb-4">La primera noche me dormí sobre la arena, a mil millas de toda tierra habitada. Estaba más aislado que un náufrago en una balsa en medio del océano. Imaginen, pues, mi sorpresa cuando, al romper el día, me despertó una extraña vocecita que decía:</p>
+                        <blockquote class="border-l-4 border-indigo-500 pl-4 italic my-4">— Por favor... ¡dibújame un cordero!</blockquote>
+                        <p class="mb-4">Me puse en pie de un salto, como herido por el rayo. Me froté los ojos. Miré bien. Y vi a un hombrecito extraordinario que me examinaba gravemente.</p>`
+                    },
+                    {
+                        title: "Capítulo III: El planeta de origen",
+                        content: `<p class="mb-4">Me costó mucho tiempo comprender de dónde venía. El principito, que me hacía muchas preguntas, jamás parecía oír las mías. Fueron palabras pronunciadas al azar las que, poco a poco, me revelaron todo.</p>
+                        <p class="mb-4">Así, cuando vio por primera vez mi avión me preguntó: <br>—¿Qué es esa cosa? <br>—No es una cosa. Eso vuela. Es un avión. Es mi avión. <br>Y me sentí orgulloso de hacerle saber que volaba. Entonces exclamó: <br>—¡Cómo! ¿Has caído del cielo?</p>`
+                    }
+                ]
+            },
+            {
+                id: "book-2",
+                title: "Frankenstein",
+                author: "Mary Shelley",
+                genre: "Terror",
+                cover: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80",
+                description: "La fascinante historia de Víctor Frankenstein y la criatura que creó a partir de restos humanos.",
+                chapters: [
+                    {
+                        title: "Capítulo 1: Orígenes de Frankenstein",
+                        content: `<p class="mb-4">Soy por nacimiento ginebrino, y mi familia es una de las más distinguidas de esa república. Mis antepasados habían sido durante muchos años consejeros y síndicos, y mi padre había servido en varios cargos públicos con honor y reputación.</p>
+                        <p class="mb-4">Todos los que le conocían le respetaban por su integridad y su incansable atención a los negocios públicos. Pasó su juventud ocupado en los asuntos de su país; pero diversas circunstancias le impidieron contraer matrimonio hasta una edad madura.</p>`
+                    },
+                    {
+                        title: "Capítulo 2: El secreto de la vida",
+                        content: `<p class="mb-4">Cuando cumplí diecisiete años, mis padres decidieron que debía ingresar en la universidad de Ingolstadt. Hasta entonces había asistido a las escuelas de Ginebra, pero mi padre juzgaba conveniente que para mi educación completa conociera las costumbres de otros países.</p>
+                        <p class="mb-4">Fue en esa universidad donde mi fascinación por las ciencias naturales y la filosofía química cobró una fuerza inusitada. Tras meses de desvelos en el laboratorio, descubrí la causa de la generación y de la vida; más aún, llegué a ser capaz de infundir vida a la materia inanimada.</p>`
+                    }
+                ]
+            },
+            {
+                id: "book-3",
+                title: "Don Quijote de la Mancha",
+                author: "Miguel de Cervantes",
+                genre: "Clásico",
+                cover: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=600&q=80",
+                description: "Las aventuras del famoso hidalgo que perdió el juicio por leer demasiados libros de caballería.",
+                chapters: [
+                    {
+                        title: "Capítulo I: De la condición y ejercicio del famoso hidalgo",
+                        content: `<p class="mb-4">En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco y galgo corredor.</p>
+                        <p class="mb-4">Una olla de algo más vaca que carnero, salpicón las más noches, duelos y quebrantos los sábados, lantejas los viernes, algún palomino de añadidura los domingos, consumían las tres partes de su hacienda.</p>
+                        <p class="mb-4">Es, pues, de saber, que este sobredicho hidalgo, los ratos que estaba ocioso —que eran los más del año— se daba a leer libros de caballerías con tanta afición y gusto, que olvidó casi de todo punto el ejercicio de la caza, y aun la administración de su hacienda.</p>`
+                    }
+                ]
+            }
+        ];
+
+        // Global State Variable
+        let booksList = [];
+        let currentBook = null;
+        let currentChapterIndex = 0;
+        let readerFontSize = 18;
+        let readerTheme = 'light';
+        let uploadSourceType = 'file';
+        let tempSelectedFileContent = null;
+        let bookmarks = {}; // Stores bookmarks & notes by book ID
+
+        // Initialize Application
+        window.addEventListener('DOMContentLoaded', () => {
+            loadBooksFromStorage();
+            loadBookmarksFromStorage();
+            renderLibrary();
+            updateReaderStyles();
+        });
+
+        // Local Storage Helpers
+        function loadBooksFromStorage() {
+            const stored = localStorage.getItem('lumina_books');
+            if (stored) {
+                try {
+                    booksList = JSON.parse(stored);
+                } catch(e) {
+                    booksList = SAMPLE_BOOKS;
+                }
+            } else {
+                booksList = [...SAMPLE_BOOKS];
+                saveBooksToStorage();
+            }
+        }
+
+        function saveBooksToStorage() {
+            localStorage.setItem('lumina_books', JSON.stringify(booksList));
+        }
+
+        function loadBookmarksFromStorage() {
+            const stored = localStorage.getItem('lumina_bookmarks');
+            if (stored) {
+                try { bookmarks = JSON.parse(stored); } catch(e) {}
+            }
+        }
+
+        function saveBookmarksToStorage() {
+            localStorage.setItem('lumina_bookmarks', JSON.stringify(bookmarks));
+        }
+
+        // NAVIGATION / TAB SWITCHING
+        function switchTab(tabName) {
+            document.getElementById('view-library').classList.add('hidden');
+            document.getElementById('view-upload').classList.add('hidden');
+            document.getElementById('view-architecture').classList.add('hidden');
+            document.getElementById('view-reader').classList.add('hidden');
+
+            // Reset Navigation Styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all";
+            });
+
+            if (tabName === 'library') {
+                document.getElementById('view-library').classList.remove('hidden');
+                document.getElementById('nav-library').className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400";
+                renderLibrary();
+            } else if (tabName === 'upload') {
+                document.getElementById('view-upload').classList.remove('hidden');
+                document.getElementById('nav-upload').className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400";
+            } else if (tabName === 'architecture') {
+                document.getElementById('view-architecture').classList.remove('hidden');
+                document.getElementById('nav-architecture').className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400";
+            }
+        }
+
+        // RENDER LIBRARY
+        function renderLibrary() {
+            const grid = document.getElementById('books-grid');
+            const emptyState = document.getElementById('empty-state');
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            const genreVal = document.getElementById('genre-filter').value;
+            const sortVal = document.getElementById('sort-filter').value;
+
+            grid.innerHTML = '';
+
+            let filtered = booksList.filter(book => {
+                const matchesSearch = book.title.toLowerCase().includes(searchVal) || 
+                                     book.author.toLowerCase().includes(searchVal) ||
+                                     book.genre.toLowerCase().includes(searchVal);
+                const matchesGenre = genreVal === 'all' || book.genre === genreVal;
+                return matchesSearch && matchesGenre;
+            });
+
+            // Sorting logic
+            if (sortVal === 'title') {
+                filtered.sort((a,b) => a.title.localeCompare(b.title));
+            } else if (sortVal === 'author') {
+                filtered.sort((a,b) => a.author.localeCompare(b.author));
+            }
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filtered.forEach(book => {
+                const savedProgress = getBookProgress(book.id);
+                const card = document.createElement('div');
+                card.className = "group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer transform hover:-translate-y-1";
+                card.onclick = () => openReader(book.id);
+
+                card.innerHTML = `
+                    <div class="relative aspect-[3/4] bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                        <img src="${book.cover || 'https://placehold.co/400x600/312e81/ffffff?text='+encodeURIComponent(book.title)}" 
+                             alt="${book.title}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                             onerror="this.src='https://placehold.co/400x600/312e81/ffffff?text=Libro'">
+                        <span class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-full font-medium">
+                            ${book.genre}
+                        </span>
+                        ${savedProgress > 0 ? `
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-6">
+                                <div class="w-full bg-gray-600 h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-indigo-400 h-full" style="width: ${savedProgress}%"></div>
+                                </div>
+                                <span class="text-[10px] text-gray-200 block mt-1 font-semibold">${savedProgress}% Leído</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-sm sm:text-base text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-indigo-600 transition-colors">${book.title}</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">${book.author}</p>
+                        </div>
+                        <button class="mt-4 w-full py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl text-xs font-bold hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>${savedProgress > 0 ? 'Continuar Lectura' : 'Leer Ahora'}</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // READER ENGINE
+        function openReader(bookId) {
+            currentBook = booksList.find(b => b.id === bookId);
+            if (!currentBook) return;
+
+            document.getElementById('view-reader').classList.remove('hidden');
+            document.getElementById('reader-book-title').textContent = currentBook.title;
+            document.getElementById('reader-book-author').textContent = currentBook.author;
+
+            // Load saved chapter position or default 0
+            const savedChapter = localStorage.getItem(`lumina_pos_${currentBook.id}`);
+            currentChapterIndex = savedChapter ? parseInt(savedChapter) : 0;
+            if (currentChapterIndex >= currentBook.chapters.length) currentChapterIndex = 0;
+
+            renderTocList();
+            renderBookmarksList();
+            loadChapter(currentChapterIndex);
+        }
+
+        function closeReader() {
+            document.getElementById('view-reader').classList.add('hidden');
+            renderLibrary();
+        }
+
+        function loadChapter(index) {
+            if (!currentBook || !currentBook.chapters[index]) return;
+
+            currentChapterIndex = index;
+            localStorage.setItem(`lumina_pos_${currentBook.id}`, currentChapterIndex);
+
+            const chapter = currentBook.chapters[index];
+            const contentBox = document.getElementById('reader-content-box');
+
+            contentBox.innerHTML = `
+                <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-indigo-600 dark:text-indigo-400 border-b pb-3 dark:border-gray-700">${chapter.title}</h1>
+                <div class="prose dark:prose-invert max-w-none">${chapter.content}</div>
+            `;
+
+            document.getElementById('chapter-indicator').textContent = `Cap. ${index + 1} de ${currentBook.chapters.length}`;
+            
+            // Scroll to top of reader viewport
+            document.getElementById('reader-viewport').scrollTop = 0;
+            updateReadingProgress();
+        }
+
+        function navigateChapter(direction) {
+            const nextIdx = currentChapterIndex + direction;
+            if (nextIdx >= 0 && nextIdx < currentBook.chapters.length) {
+                loadChapter(nextIdx);
+            }
+        }
+
+        function updateReadingProgress() {
+            if (!currentBook || currentBook.chapters.length === 0) return;
+            const progress = Math.round(((currentChapterIndex + 1) / currentBook.chapters.length) * 100);
+            document.getElementById('reading-progress-bar').style.width = `${progress}%`;
+            document.getElementById('reading-progress-text').textContent = `${progress}%`;
+
+            // Save overall progress in localstorage
+            localStorage.setItem(`lumina_progress_${currentBook.id}`, progress);
+        }
+
+        function getBookProgress(bookId) {
+            return localStorage.getItem(`lumina_progress_${bookId}`) || 0;
+        }
+
+        // TOC SIDEBAR & BOOKMARKS
+        function renderTocList() {
+            const list = document.getElementById('toc-list');
+            list.innerHTML = '';
+
+            currentBook.chapters.forEach((chap, idx) => {
+                const item = document.createElement('button');
+                const isActive = idx === currentChapterIndex;
+                item.className = `w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between ${
+                    isActive 
+                        ? 'bg-indigo-600 text-white shadow-sm' 
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                }`;
+                item.onclick = () => {
+                    loadChapter(idx);
+                    toggleTocMenu();
+                };
+                item.innerHTML = `
+                    <span class="line-clamp-1">${chap.title}</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] opacity-70"></i>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function toggleTocMenu() {
+            const sidebar = document.getElementById('toc-sidebar');
+            sidebar.classList.toggle('hidden');
+            document.getElementById('bookmarks-sidebar').classList.add('hidden');
+            document.getElementById('settings-popup').classList.add('hidden');
+        }
+
+        function toggleBookmarksMenu() {
+            const sidebar = document.getElementById('bookmarks-sidebar');
+            sidebar.classList.toggle('hidden');
+            document.getElementById('toc-sidebar').classList.add('hidden');
+            document.getElementById('settings-popup').classList.add('hidden');
+        }
+
+        function toggleSettingsMenu() {
+            const popup = document.getElementById('settings-popup');
+            popup.classList.toggle('hidden');
+            document.getElementById('toc-sidebar').classList.add('hidden');
+            document.getElementById('bookmarks-sidebar').classList.add('hidden');
+        }
+
+        // BOOKMARKS AND NOTES LOGIC
+        function addCurrentBookmark() {
+            if (!currentBook) return;
+            if (!bookmarks[currentBook.id]) bookmarks[currentBook.id] = [];
+
+            const chapterTitle = currentBook.chapters[currentChapterIndex].title;
+            const newBookmark = {
+                id: Date.now(),
+                chapterIdx: currentChapterIndex,
+                title: chapterTitle,
+                type: 'bookmark',
+                date: new Date().toLocaleDateString()
+            };
+
+            bookmarks[currentBook.id].push(newBookmark);
+            saveBookmarksToStorage();
+            renderBookmarksList();
+            showToast('Marcador añadido correctamente');
+        }
+
+        function saveNote() {
+            const input = document.getElementById('new-note-text');
+            const text = input.value.trim();
+            if (!text || !currentBook) return;
+
+            if (!bookmarks[currentBook.id]) bookmarks[currentBook.id] = [];
+
+            const newNote = {
+                id: Date.now(),
+                chapterIdx: currentChapterIndex,
+                title: currentBook.chapters[currentChapterIndex].title,
+                text: text,
+                type: 'note',
+                date: new Date().toLocaleDateString()
+            };
+
+            bookmarks[currentBook.id].push(newNote);
+            saveBookmarksToStorage();
+            renderBookmarksList();
+            input.value = '';
+            showToast('Nota guardada');
+        }
+
+        function renderBookmarksList() {
+            const list = document.getElementById('bookmarks-list');
+            list.innerHTML = '';
+            
+            const bookMarks = (currentBook && bookmarks[currentBook.id]) ? bookmarks[currentBook.id] : [];
+
+            if (bookMarks.length === 0) {
+                list.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">No tienes marcadores ni notas guardadas.</p>`;
+                return;
+            }
+
+            bookMarks.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "p-3 rounded-xl bg-gray-50 dark:bg-gray-700/60 border border-gray-200 dark:border-gray-600 text-xs space-y-1 relative group";
+                
+                if (item.type === 'bookmark') {
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between font-semibold text-indigo-600 dark:text-indigo-400">
+                            <span><i class="fa-solid fa-bookmark mr-1"></i> Marcador</span>
+                            <span class="text-[10px] text-gray-400">${item.date}</span>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 font-medium cursor-pointer hover:underline" onclick="loadChapter(${item.chapterIdx})">${item.title}</p>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between font-semibold text-amber-600 dark:text-amber-400">
+                            <span><i class="fa-solid fa-note-sticky mr-1"></i> Nota</span>
+                            <span class="text-[10px] text-gray-400">${item.date}</span>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-200 italic">"${item.text}"</p>
+                        <p class="text-[10px] text-gray-400 pt-1 cursor-pointer hover:underline" onclick="loadChapter(${item.chapterIdx})">En: ${item.title}</p>
+                    `;
+                }
+
+                // Delete Button
+                const delBtn = document.createElement('button');
+                delBtn.className = "absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity";
+                delBtn.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteBookmark(item.id);
+                };
+                card.appendChild(delBtn);
+
+                list.appendChild(card);
+            });
+        }
+
+        function deleteBookmark(id) {
+            if (!currentBook || !bookmarks[currentBook.id]) return;
+            bookmarks[currentBook.id] = bookmarks[currentBook.id].filter(b => b.id !== id);
+            saveBookmarksToStorage();
+            renderBookmarksList();
+        }
+
+        // READER CUSTOMIZATION / APPEARANCE CONTROLS
+        function setReaderTheme(theme) {
+            readerTheme = theme;
+            const viewport = document.getElementById('view-reader');
+            viewport.classList.remove('sepia-mode', 'dark');
+
+            if (theme === 'sepia') {
+                viewport.classList.add('sepia-mode');
+            } else if (theme === 'dark') {
+                viewport.classList.add('dark');
+            }
+        }
+
+        function onFontSizeSliderChange(val) {
+            readerFontSize = parseInt(val);
+            document.getElementById('font-size-label').textContent = `${readerFontSize}px`;
+            updateReaderStyles();
+        }
+
+        function changeFontSize(delta) {
+            readerFontSize = Math.min(28, Math.max(14, readerFontSize + delta));
+            document.getElementById('font-size-slider').value = readerFontSize;
+            document.getElementById('font-size-label').textContent = `${readerFontSize}px`;
+            updateReaderStyles();
+        }
+
+        function updateReaderStyles() {
+            const contentBox = document.getElementById('reader-content-box');
+            const fontSelect = document.getElementById('reader-font-family');
+            
+            contentBox.style.fontSize = `${readerFontSize}px`;
+            
+            // Apply font family class
+            contentBox.className = `w-full max-w-3xl transition-all duration-150 leading-relaxed text-lg select-text ${fontSelect.value}`;
+        }
+
+        function setMarginSize(size) {
+            const contentBox = document.getElementById('reader-content-box');
+            if (size === 'narrow') {
+                contentBox.className = contentBox.className.replace(/max-w-\w+/g, '') + ' max-w-xl';
+            } else if (size === 'normal') {
+                contentBox.className = contentBox.className.replace(/max-w-\w+/g, '') + ' max-w-3xl';
+            } else if (size === 'wide') {
+                contentBox.className = contentBox.className.replace(/max-w-\w+/g, '') + ' max-w-5xl';
+            }
+        }
+
+        // FILE & BOOK UPLOAD HANDLER
+        function setUploadSource(type) {
+            uploadSourceType = type;
+            const fileBtn = document.getElementById('tab-btn-file');
+            const textBtn = document.getElementById('tab-btn-text');
+            const fileContainer = document.getElementById('source-file-container');
+            const textContainer = document.getElementById('source-text-container');
+
+            if (type === 'file') {
+                fileBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white";
+                textBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
+                fileContainer.classList.remove('hidden');
+                textContainer.classList.add('hidden');
+            } else {
+                textBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold bg-indigo-600 text-white";
+                fileBtn.className = "px-4 py-2 rounded-lg text-xs font-semibold bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
+                textContainer.classList.remove('hidden');
+                fileContainer.classList.add('hidden');
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('file-name-display').textContent = `Archivo seleccionado: ${file.name}`;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                tempSelectedFileContent = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+
+        function handleBookUpload(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('upload-title').value.trim();
+            const author = document.getElementById('upload-author').value.trim();
+            const genre = document.getElementById('upload-genre').value;
+            const cover = document.getElementById('upload-cover').value.trim();
+            const description = document.getElementById('upload-description').value.trim();
+
+            let rawText = "";
+
+            if (uploadSourceType === 'file') {
+                if (!tempSelectedFileContent) {
+                    alert("Por favor selecciona un archivo válido o usa la opción de texto directo.");
+                    return;
+                }
+                rawText = tempSelectedFileContent;
+            } else {
+                rawText = document.getElementById('raw-content-input').value.trim();
+                if (!rawText) {
+                    alert("Por favor ingresa o pega el contenido del libro.");
+                    return;
+                }
+            }
+
+            // Auto-split text into chapters if keywords exist
+            const chapters = parseRawTextToChapters(rawText);
+
+            const newBook = {
+                id: `book-${Date.now()}`,
+                title: title,
+                author: author,
+                genre: genre,
+                cover: cover || 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600&q=80',
+                description: description || 'Sin descripción disponible.',
+                chapters: chapters
+            };
+
+            booksList.unshift(newBook);
+            saveBooksToStorage();
+
+            // Reset Form & Redirect
+            document.getElementById('upload-form').reset();
+            tempSelectedFileContent = null;
+            document.getElementById('file-name-display').textContent = '';
+            
+            showToast('¡Libro publicado en la biblioteca!');
+            switchTab('library');
+        }
+
+        function parseRawTextToChapters(text) {
+            // Simple logic to parse text into chapters based on "Capítulo" headings or length
+            const chapterRegex = /(Capítulo\s+[\dIVXLCDM]+|CHAPTER\s+[\dIVXLCDM]+)/gi;
+            const parts = text.split(chapterRegex);
+
+            if (parts.length > 2) {
+                const chapters = [];
+                for (let i = 1; i < parts.length; i += 2) {
+                    const title = parts[i];
+                    const contentText = parts[i + 1] || '';
+                    chapters.push({
+                        title: title,
+                        content: contentText.split('\n').filter(p => p.trim().length > 0).map(p => `<p class="mb-4">${p}</p>`).join('')
+                    });
+                }
+                return chapters;
+            }
+
+            // Fallback: If no chapter titles found, split by ~1500 chars chunks or keep as single chapter
+            const paragraphs = text.split('\n').filter(p => p.trim().length > 0);
+            return [
+                {
+                    title: "Lectura Principal",
+                    content: paragraphs.map(p => `<p class="mb-4">${p}</p>`).join('')
+                }
+            ];
+        }
+
+        // DARK MODE TOGGLE
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.className = 'fa-solid fa-sun text-lg text-amber-400';
+            } else {
+                icon.className = 'fa-solid fa-moon text-lg';
+            }
+        }
+
+        // UTILITY TOAST NOTIFICATION
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 right-6 bg-gray-900 text-white dark:bg-indigo-600 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold z-50 transition-all transform translate-y-2 opacity-0 flex items-center space-x-2';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 dark:text-white"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
