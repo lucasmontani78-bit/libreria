@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Biblioteca & Visor de PDFs</title>
+  <title>Biblioteca & Visor de PDFs (MVC)</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Estilos Personalizados -->
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
 
@@ -18,8 +21,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
         
-        <!-- Logo / Marca -->
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="showView('catalog')">
+        <div class="flex items-center space-x-3 cursor-pointer" id="btnNavHome">
           <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md">
             <i data-lucide="book-open" class="w-6 h-6"></i>
           </div>
@@ -27,24 +29,17 @@
             <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
               LecturaInteractive
             </h1>
-            <p class="text-xs text-slate-400">Tu visor y biblioteca de archivos PDF</p>
+            <p class="text-xs text-slate-400">Arquitectura MVC</p>
           </div>
         </div>
 
-        <!-- Botones de Navegación -->
         <nav class="flex items-center space-x-2">
-          <button 
-            id="navBtnCatalog"
-            onclick="showView('catalog')" 
-            class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-50 text-indigo-700">
+          <button id="navBtnCatalog" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-50 text-indigo-700">
             <i data-lucide="library" class="w-4 h-4"></i>
             <span>Catálogo</span>
           </button>
           
-          <button 
-            id="navBtnUpload"
-            onclick="openFormForCreate()" 
-            class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100">
+          <button id="navBtnUpload" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>Cargar Libro</span>
           </button>
@@ -57,56 +52,38 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- VISTA 1: CATÁLOGO DE LIBROS -->
+    <!-- VISTA 1: CATÁLOGO -->
     <section id="viewCatalog" class="space-y-6">
-      
-      <!-- Encabezado del catálogo -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 class="text-2xl font-bold text-slate-900">Mis Libros</h2>
           <p class="text-slate-500 text-sm">Explora tu colección de PDFs o sube un documento nuevo.</p>
         </div>
         
-        <!-- Buscador -->
         <div class="relative w-full sm:w-72">
           <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-          <input 
-            type="text" 
-            id="searchInput" 
-            oninput="filterBooks()" 
-            placeholder="Buscar por título o autor..." 
-            class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
-          />
+          <input type="text" id="searchInput" placeholder="Buscar por título o autor..." class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" />
         </div>
       </div>
 
-      <!-- Cuadrícula de libros -->
-      <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <!-- Los libros se insertan dinámicamente -->
-      </div>
+      <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
 
-      <!-- Estado vacío -->
       <div id="emptyCatalogState" class="hidden flex-col items-center justify-center py-16 bg-white rounded-2xl border border-dashed border-slate-300 text-center">
         <div class="p-4 bg-indigo-50 text-indigo-600 rounded-full mb-3">
           <i data-lucide="file-text" class="w-8 h-8"></i>
         </div>
         <h3 class="text-lg font-semibold text-slate-800 mb-1">No hay libros guardados</h3>
         <p class="text-slate-500 text-sm max-w-md mb-4">Sube tu primer archivo PDF para comenzar a leerlo directamente en la plataforma.</p>
-        <button 
-          onclick="openFormForCreate()" 
-          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow transition-colors inline-flex items-center space-x-2">
+        <button id="btnEmptyCreate" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow transition-colors inline-flex items-center space-x-2">
           <i data-lucide="upload-cloud" class="w-4 h-4"></i>
           <span>Cargar un PDF</span>
         </button>
       </div>
-
     </section>
 
-    <!-- VISTA 2: FORMULARIO DE CARGA / EDICIÓN -->
+    <!-- VISTA 2: FORMULARIO -->
     <section id="viewUpload" class="hidden max-w-2xl mx-auto">
       <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
-        
-        <!-- Encabezado del Formulario -->
         <div class="border-b border-slate-100 pb-4">
           <div class="flex items-center space-x-3 mb-1" id="formHeaderTitle">
             <i data-lucide="upload-cloud" class="w-6 h-6 text-indigo-600"></i>
@@ -115,13 +92,10 @@
           <p class="text-sm text-slate-500" id="formHeaderSubtitle">Selecciona un archivo PDF de tu equipo e ingresa sus detalles.</p>
         </div>
 
-        <!-- Formulario -->
-        <form id="bookForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-          
+        <form id="bookForm" class="space-y-4">
           <input type="hidden" id="editingBookId" value="" />
           <input type="hidden" id="pdfDataUrl" value="" />
 
-          <!-- Título y Autor -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Título *</label>
@@ -133,7 +107,6 @@
             </div>
           </div>
 
-          <!-- Género e Imagen de Portada -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Género</label>
@@ -145,50 +118,29 @@
             </div>
           </div>
 
-          <!-- Selector de Archivo PDF -->
           <div class="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-xl space-y-2">
             <label class="block text-xs font-semibold text-slate-700">Seleccionar Documento PDF *</label>
-            <input 
-              type="file" 
-              id="uploadFile" 
-              accept=".pdf,application/pdf" 
-              onchange="handlePdfUpload(event)" 
-              class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
-            />
-            
+            <input type="file" id="uploadFile" accept=".pdf,application/pdf" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
             <p id="pdfStatusText" class="text-xs text-slate-500 mt-1">Ningún archivo PDF seleccionado aún.</p>
           </div>
 
-          <!-- Acciones -->
           <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-            <button 
-              type="button" 
-              onclick="showView('catalog')" 
-              class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50">
-              Cancelar
-            </button>
-            <button 
-              type="submit" 
-              id="formSubmitBtn" 
-              class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow inline-flex items-center space-x-2">
+            <button type="button" id="btnCancelForm" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50">Cancelar</button>
+            <button type="submit" id="formSubmitBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow inline-flex items-center space-x-2">
               <i data-lucide="check" class="w-4 h-4"></i>
               <span>Guardar Libro</span>
             </button>
           </div>
-
         </form>
-
       </div>
     </section>
 
-    <!-- VISTA 3: VISOR INTEGRADO DE PDF -->
+    <!-- VISTA 3: VISOR PDF -->
     <section id="viewReader" class="hidden">
       <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[85vh]">
-        
-        <!-- Header de Lectura -->
         <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <button onclick="showView('catalog')" class="p-1.5 text-slate-500 hover:bg-slate-200 rounded-lg transition-colors" title="Volver al catálogo">
+            <button id="btnBackToCatalog" class="p-1.5 text-slate-500 hover:bg-slate-200 rounded-lg transition-colors" title="Volver al catálogo">
               <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </button>
             <div>
@@ -197,283 +149,21 @@
             </div>
           </div>
 
-          <div class="flex items-center space-x-2">
-            <a id="readerDownloadBtn" download="documento.pdf" href="#" class="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-xs font-semibold flex items-center space-x-1">
-              <i data-lucide="download" class="w-4 h-4"></i>
-              <span class="hidden sm:inline">Descargar PDF</span>
-            </a>
-          </div>
+          <a id="readerDownloadBtn" download="documento.pdf" href="#" class="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-xs font-semibold flex items-center space-x-1">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Descargar PDF</span>
+          </a>
         </div>
 
-        <!-- Contenedor del PDF visor (iframe) -->
         <div class="flex-1 bg-slate-100">
           <iframe id="pdfViewer" class="w-full h-full border-0" src="about:blank"></iframe>
         </div>
-
       </div>
     </section>
 
   </main>
 
-  <!-- LÓGICA JAVASCRIPT -->
-  <script>
-    let books = [];
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadBooksFromStorage();
-      renderCatalog();
-      lucide.createIcons();
-    });
-
-    // NAVEGACIÓN ENTRE VISTAS
-    function showView(viewName) {
-      document.getElementById('viewCatalog').classList.add('hidden');
-      document.getElementById('viewUpload').classList.add('hidden');
-      document.getElementById('viewReader').classList.add('hidden');
-
-      document.getElementById('navBtnCatalog').className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100";
-      document.getElementById('navBtnUpload').className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100";
-
-      if (viewName === 'catalog') {
-        document.getElementById('viewCatalog').classList.remove('hidden');
-        document.getElementById('navBtnCatalog').className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-50 text-indigo-700";
-        renderCatalog();
-      } else if (viewName === 'upload') {
-        document.getElementById('viewUpload').classList.remove('hidden');
-        document.getElementById('navBtnUpload').className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-50 text-indigo-700";
-      } else if (viewName === 'reader') {
-        document.getElementById('viewReader').classList.remove('hidden');
-      }
-
-      lucide.createIcons();
-    }
-
-    // ABRIR FORMULARIO EN MODO CREAR
-    function openFormForCreate() {
-      document.getElementById('editingBookId').value = '';
-      document.getElementById('pdfDataUrl').value = '';
-      document.getElementById('bookForm').reset();
-      document.getElementById('pdfStatusText').innerText = 'Ningún archivo PDF seleccionado aún.';
-      document.getElementById('pdfStatusText').className = 'text-xs text-slate-500 mt-1';
-
-      document.getElementById('formHeaderTitle').innerHTML = `
-        <i data-lucide="upload-cloud" class="w-6 h-6 text-indigo-600"></i>
-        <h2 class="text-xl font-bold text-slate-900">Cargar Nuevo Libro PDF</h2>
-      `;
-      document.getElementById('formHeaderSubtitle').innerText = 'Selecciona un archivo PDF de tu equipo e ingresa sus detalles.';
-      document.getElementById('formSubmitBtn').innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Guardar Libro</span>`;
-
-      showView('upload');
-    }
-
-    // ABRIR FORMULARIO EN MODO EDITAR
-    function openFormForEdit(bookId) {
-      const book = books.find(b => b.id === bookId);
-      if (!book) return;
-
-      document.getElementById('editingBookId').value = book.id;
-      document.getElementById('uploadTitle').value = book.title;
-      document.getElementById('uploadAuthor').value = book.author;
-      document.getElementById('uploadGenre').value = book.genre || '';
-      document.getElementById('uploadCover').value = book.cover || '';
-      document.getElementById('pdfDataUrl').value = book.pdfUrl || '';
-      document.getElementById('uploadFile').value = '';
-
-      document.getElementById('pdfStatusText').innerText = '✓ Documento PDF actual cargado. (Selecciona uno nuevo solo si deseas reemplazarlo)';
-      document.getElementById('pdfStatusText').className = 'text-xs text-emerald-600 font-medium mt-1';
-
-      document.getElementById('formHeaderTitle').innerHTML = `
-        <i data-lucide="edit-3" class="w-6 h-6 text-indigo-600"></i>
-        <h2 class="text-xl font-bold text-slate-900">Editar Libro</h2>
-      `;
-      document.getElementById('formHeaderSubtitle').innerText = 'Modifica el título, autor o adjunta un nuevo archivo PDF para reemplazar el actual.';
-      document.getElementById('formSubmitBtn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i><span>Actualizar Cambios</span>`;
-
-      showView('upload');
-    }
-
-    // LEER EL ARCHIVO PDF EN BASE64
-    function handlePdfUpload(event) {
-      const file = event.target.files[0];
-      const statusText = document.getElementById('pdfStatusText');
-
-      if (!file) return;
-
-      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-        alert('Por favor selecciona un archivo con extensión .pdf');
-        event.target.value = '';
-        return;
-      }
-
-      statusText.innerText = 'Cargando y procesando archivo PDF...';
-      statusText.className = 'text-xs text-indigo-600 font-medium mt-1';
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('pdfDataUrl').value = e.target.result;
-        statusText.innerText = `✓ PDF cargado correctamente (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
-        statusText.className = 'text-xs text-emerald-600 font-medium mt-1';
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // GUARDAR O ACTUALIZAR LIBRO
-    function handleFormSubmit(event) {
-      event.preventDefault();
-
-      const id = document.getElementById('editingBookId').value;
-      const title = document.getElementById('uploadTitle').value.trim();
-      const author = document.getElementById('uploadAuthor').value.trim();
-      const genre = document.getElementById('uploadGenre').value.trim();
-      const cover = document.getElementById('uploadCover').value.trim();
-      const pdfUrl = document.getElementById('pdfDataUrl').value;
-
-      if (!pdfUrl) {
-        alert('Debes adjuntar un archivo PDF para guardar el libro.');
-        return;
-      }
-
-      if (id) {
-        // Actualizar existente
-        const index = books.findIndex(b => b.id === id);
-        if (index !== -1) {
-          books[index] = { ...books[index], title, author, genre, cover, pdfUrl };
-        }
-      } else {
-        // Crear nuevo
-        const newBook = {
-          id: Date.now().toString(),
-          title,
-          author,
-          genre: genre || 'General',
-          cover: cover || 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=400&q=80',
-          pdfUrl
-        };
-        books.push(newBook);
-      }
-
-      saveBooksToStorage();
-      showView('catalog');
-    }
-
-    // ELIMINAR LIBRO
-    function deleteBook(bookId, event) {
-      event.stopPropagation();
-      if (confirm('¿Estás seguro de que deseas eliminar este libro?')) {
-        books = books.filter(b => b.id !== bookId);
-        saveBooksToStorage();
-        renderCatalog();
-      }
-    }
-
-    // RENDERIZAR TARJETAS EN EL CATÁLOGO
-    function renderCatalog(filteredBooks = null) {
-      const listToRender = filteredBooks || books;
-      const grid = document.getElementById('booksGrid');
-      const emptyState = document.getElementById('emptyCatalogState');
-
-      grid.innerHTML = '';
-
-      if (listToRender.length === 0) {
-        emptyState.classList.remove('hidden');
-        emptyState.classList.add('flex');
-        return;
-      }
-
-      emptyState.classList.add('hidden');
-      emptyState.classList.remove('flex');
-
-      listToRender.forEach(book => {
-        const card = document.createElement('div');
-        card.className = "bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group cursor-pointer";
-        card.onclick = () => openReader(book.id);
-
-        card.innerHTML = `
-          <div>
-            <div class="h-48 w-full bg-slate-100 overflow-hidden relative">
-              <img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=400&q=80'">
-              <span class="absolute top-2 right-2 bg-slate-900/70 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm">
-                ${book.genre || 'PDF'}
-              </span>
-            </div>
-            <div class="p-4">
-              <h3 class="font-bold text-slate-800 text-base line-clamp-1">${book.title}</h3>
-              <p class="text-xs text-slate-500 mb-2">${book.author}</p>
-              <span class="inline-flex items-center space-x-1 text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
-                <i data-lucide="file" class="w-3 h-3"></i>
-                <span>Documento PDF</span>
-              </span>
-            </div>
-          </div>
-
-          <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between" onclick="event.stopPropagation()">
-            <button onclick="openReader('${book.id}')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
-              <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
-              <span>Leer PDF</span>
-            </button>
-            <div class="flex items-center space-x-1">
-              <button onclick="openFormForEdit('${book.id}')" class="p-1 text-slate-400 hover:text-indigo-600 rounded" title="Editar">
-                <i data-lucide="edit-2" class="w-4 h-4"></i>
-              </button>
-              <button onclick="deleteBook('${book.id}', event)" class="p-1 text-slate-400 hover:text-red-600 rounded" title="Eliminar">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-
-      lucide.createIcons();
-    }
-
-    // BUSCADOR
-    function filterBooks() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = books.filter(b => 
-        b.title.toLowerCase().includes(query) || 
-        b.author.toLowerCase().includes(query)
-      );
-      renderCatalog(filtered);
-    }
-
-    // ABRIR PDF EN EL VISOR
-    function openReader(bookId) {
-      const book = books.find(b => b.id === bookId);
-      if (!book || !book.pdfUrl) return;
-
-      document.getElementById('readerTitle').innerText = book.title;
-      document.getElementById('readerAuthor').innerText = book.author;
-      
-      const downloadBtn = document.getElementById('readerDownloadBtn');
-      downloadBtn.href = book.pdfUrl;
-      downloadBtn.download = `${book.title}.pdf`;
-
-      // Cargar directamente el Data URL dentro del iframe del visor
-      document.getElementById('pdfViewer').src = book.pdfUrl;
-
-      showView('reader');
-    }
-
-    // ALMACENAMIENTO LOCAL
-    function saveBooksToStorage() {
-      try {
-        localStorage.setItem('interactive_library_books', JSON.stringify(books));
-      } catch (e) {
-        alert('El archivo PDF es demasiado grande para el almacenamiento local de este navegador.');
-      }
-    }
-
-    function loadBooksFromStorage() {
-      const stored = localStorage.getItem('interactive_library_books');
-      if (stored) {
-        try {
-          books = JSON.parse(stored);
-        } catch (e) {
-          books = [];
-        }
-      }
-    }
-  </script>
+  <!-- Modulo Principal JS -->
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
