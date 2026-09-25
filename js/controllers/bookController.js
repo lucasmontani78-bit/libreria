@@ -7,8 +7,15 @@ export class BookController {
   }
 
   init() {
+    this.updateDashboard();
     this.renderCatalog();
     this.bindEvents();
+    this.view.switchView('home');
+  }
+
+  updateDashboard() {
+    const books = this.model.getAll();
+    this.view.renderDashboard(books, (id) => this.handleReadBook(id));
   }
 
   renderCatalog(booksToRender = null) {
@@ -22,21 +29,63 @@ export class BookController {
   }
 
   bindEvents() {
-    document.getElementById('btnNavHome').onclick = () => this.view.switchView('catalog');
+    // Navegación
+    document.getElementById('btnNavHome').onclick = () => {
+      this.updateDashboard();
+      this.view.switchView('home');
+    };
+    this.view.navBtnHome.onclick = () => {
+      this.updateDashboard();
+      this.view.switchView('home');
+    };
     this.view.navBtnCatalog.onclick = () => {
       this.renderCatalog();
       this.view.switchView('catalog');
     };
     this.view.navBtnUpload.onclick = () => this.view.setupCreateForm();
-    document.getElementById('btnEmptyCreate').onclick = () => this.view.setupCreateForm();
-    document.getElementById('btnCancelForm').onclick = () => this.view.switchView('catalog');
-    document.getElementById('btnBackToCatalog').onclick = () => this.view.switchView('catalog');
 
+    // Botones del Dashboard / Menú Principal
+    document.getElementById('heroGoCatalog').onclick = () => {
+      this.renderCatalog();
+      this.view.switchView('catalog');
+    };
+    document.getElementById('heroGoUpload').onclick = () => this.view.setupCreateForm();
+    document.getElementById('cardNavCatalog').onclick = () => {
+      this.renderCatalog();
+      this.view.switchView('catalog');
+    };
+    document.getElementById('cardNavUpload').onclick = () => this.view.setupCreateForm();
+    document.getElementById('cardNavRecent').onclick = () => {
+      const books = this.model.getAll();
+      if (books.length > 0) {
+        this.handleReadBook(books[books.length - 1].id);
+      } else {
+        this.view.setupCreateForm();
+      }
+    };
+    document.getElementById('btnSeeAllRecent').onclick = () => {
+      this.renderCatalog();
+      this.view.switchView('catalog');
+    };
+
+    // Botones auxiliares
+    document.getElementById('btnEmptyCreate').onclick = () => this.view.setupCreateForm();
+    document.getElementById('btnCancelForm').onclick = () => {
+      this.updateDashboard();
+      this.view.switchView('home');
+    };
+    document.getElementById('btnBackToCatalog').onclick = () => {
+      this.renderCatalog();
+      this.view.switchView('catalog');
+    };
+
+    // Búsqueda
     document.getElementById('searchInput').oninput = (e) => {
       const filtered = this.model.filter(e.target.value);
       this.renderCatalog(filtered);
     };
 
+    // Eventos del formulario
     this.view.uploadFile.onchange = (e) => this.handlePdfFileChange(e);
     this.view.bookForm.onsubmit = (e) => this.handleFormSubmit(e);
   }
@@ -84,6 +133,7 @@ export class BookController {
       this.model.add({ title, author, genre, cover, pdfUrl });
     }
 
+    this.updateDashboard();
     this.renderCatalog();
     this.view.switchView('catalog');
   }
@@ -101,6 +151,7 @@ export class BookController {
   handleDeleteBook(id) {
     if (confirm('¿Deseas eliminar este libro de la colección?')) {
       this.model.delete(id);
+      this.updateDashboard();
       this.renderCatalog();
     }
   }
