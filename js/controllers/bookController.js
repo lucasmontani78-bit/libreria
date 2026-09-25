@@ -22,7 +22,6 @@ export class BookController {
   }
 
   bindEvents() {
-    // Navegación
     document.getElementById('btnNavHome').onclick = () => this.view.switchView('catalog');
     this.view.navBtnCatalog.onclick = () => {
       this.renderCatalog();
@@ -33,16 +32,12 @@ export class BookController {
     document.getElementById('btnCancelForm').onclick = () => this.view.switchView('catalog');
     document.getElementById('btnBackToCatalog').onclick = () => this.view.switchView('catalog');
 
-    // Buscador
     document.getElementById('searchInput').oninput = (e) => {
       const filtered = this.model.filter(e.target.value);
       this.renderCatalog(filtered);
     };
 
-    // Procesamiento de archivo PDF a Base64
     this.view.uploadFile.onchange = (e) => this.handlePdfFileChange(e);
-
-    // Guardar / Actualizar
     this.view.bookForm.onsubmit = (e) => this.handleFormSubmit(e);
   }
 
@@ -57,13 +52,13 @@ export class BookController {
     }
 
     this.view.pdfStatusText.innerText = 'Cargando y procesando archivo PDF...';
-    this.view.pdfStatusText.className = 'text-xs text-indigo-600 font-medium mt-1';
+    this.view.pdfStatusText.className = 'text-xs text-[#2D4B3E] font-medium mt-2';
 
     const reader = new FileReader();
     reader.onload = (event) => {
       this.view.pdfDataUrl.value = event.target.result;
       this.view.pdfStatusText.innerText = `✓ PDF cargado correctamente (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
-      this.view.pdfStatusText.className = 'text-xs text-emerald-600 font-medium mt-1';
+      this.view.pdfStatusText.className = 'text-xs text-emerald-700 font-medium mt-2';
     };
     reader.readAsDataURL(file);
   }
@@ -104,9 +99,9 @@ export class BookController {
   }
 
   handleDeleteBook(id) {
-    if (confirm('¿Deseas eliminar este libro?')) {
+    if (confirm('¿Deseas eliminar este libro de la colección?')) {
       this.model.delete(id);
       this.renderCatalog();
     }
   }
-}   
+}
