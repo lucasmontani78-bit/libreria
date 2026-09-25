@@ -21,7 +21,7 @@ export class BookModel {
       localStorage.setItem(this.storageKey, JSON.stringify(this.books));
       return true;
     } catch (e) {
-      alert('El archivo PDF supera el espacio permitido por el almacenamiento del navegador.');
+      alert('El archivo PDF supera el espacio permitido por el almacenamiento local del navegador.');
       return false;
     }
   }
