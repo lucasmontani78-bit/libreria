@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Biblioteca & Visor de PDFs (MVC)</title>
+  <title>Biblioteca Digital & Lector PDF</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,159 +11,176 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
+  <!-- Google Fonts: Plus Jakarta Sans (UI) & Lora (Editorial/Libros) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <!-- Estilos Personalizados -->
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+<body class="min-h-screen flex flex-col selection:bg-[#2D4B3E] selection:text-white">
 
-  <!-- NAVEGACIÓN PRINCIPAL -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16 items-center">
-        
-        <div class="flex items-center space-x-3 cursor-pointer" id="btnNavHome">
-          <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md">
-            <i data-lucide="book-open" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-              LecturaInteractive
-            </h1>
-            <p class="text-xs text-slate-400">Arquitectura MVC</p>
-          </div>
+  <!-- ENCABEZADO Y NAVEGACIÓN -->
+  <header class="bg-[#FBF9F5]/90 backdrop-blur-md border-b border-[#E8E3DA] sticky top-0 z-30 transition-all">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+      
+      <!-- Marca / Logo -->
+      <div class="flex items-center space-x-3.5 cursor-pointer" id="btnNavHome">
+        <div class="w-10 h-10 bg-[#2D4B3E] text-[#FBF9F5] rounded-2xl flex items-center justify-center shadow-md shadow-[#2D4B3E]/10">
+          <i data-lucide="bookmark" class="w-5 h-5"></i>
         </div>
-
-        <nav class="flex items-center space-x-2">
-          <button id="navBtnCatalog" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-50 text-indigo-700">
-            <i data-lucide="library" class="w-4 h-4"></i>
-            <span>Catálogo</span>
-          </button>
-          
-          <button id="navBtnUpload" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            <span>Cargar Libro</span>
-          </button>
-        </nav>
-
+        <div>
+          <h1 class="font-serif-book text-xl font-semibold text-[#1A1918] tracking-tight">
+            Biblioteca
+          </h1>
+          <p class="text-[10px] text-[#706E6B] font-semibold tracking-widest uppercase">Colección Digital</p>
+        </div>
       </div>
+
+      <!-- Menú de Navegación -->
+      <nav class="flex items-center space-x-3">
+        <button id="navBtnCatalog" class="px-4 py-2.5 rounded-xl text-sm font-medium text-[#1A1918] bg-[#E8E3DA]/60 transition-all">
+          Catálogo
+        </button>
+        
+        <button id="navBtnUpload" class="px-5 py-2.5 bg-[#2D4B3E] hover:bg-[#1F352B] text-[#FBF9F5] rounded-xl text-sm font-medium shadow-sm transition-all flex items-center space-x-2">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Añadir Libro</span>
+        </button>
+      </nav>
+
     </div>
   </header>
 
   <!-- CONTENIDO PRINCIPAL -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-10">
 
     <!-- VISTA 1: CATÁLOGO -->
-    <section id="viewCatalog" class="space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <section id="viewCatalog" class="space-y-8">
+      
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-[#E8E3DA] pb-6">
         <div>
-          <h2 class="text-2xl font-bold text-slate-900">Mis Libros</h2>
-          <p class="text-slate-500 text-sm">Explora tu colección de PDFs o sube un documento nuevo.</p>
+          <h2 class="font-serif-book text-3xl font-semibold text-[#1A1918]">Mi Colección</h2>
+          <p class="text-[#706E6B] text-sm mt-1">Explora tus documentos PDF o añade nuevas obras a la estantería.</p>
         </div>
         
-        <div class="relative w-full sm:w-72">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-          <input type="text" id="searchInput" placeholder="Buscar por título o autor..." class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" />
+        <!-- Búsqueda -->
+        <div class="relative w-full sm:w-80">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#706E6B]"></i>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Buscar por título o autor..." 
+            class="w-full pl-10 pr-4 py-2.5 bg-white border border-[#E8E3DA] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2D4B3E]/30 focus:border-[#2D4B3E] transition-all" 
+          />
         </div>
       </div>
 
-      <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+      <!-- Grid de Tarjetas -->
+      <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"></div>
 
-      <div id="emptyCatalogState" class="hidden flex-col items-center justify-center py-16 bg-white rounded-2xl border border-dashed border-slate-300 text-center">
-        <div class="p-4 bg-indigo-50 text-indigo-600 rounded-full mb-3">
-          <i data-lucide="file-text" class="w-8 h-8"></i>
+      <!-- Estado Vacío -->
+      <div id="emptyCatalogState" class="hidden flex-col items-center justify-center py-20 bg-white/70 backdrop-blur-sm rounded-3xl border border-dashed border-[#E8E3DA] text-center">
+        <div class="w-14 h-14 bg-[#F3EFE6] text-[#2D4B3E] rounded-2xl flex items-center justify-center mb-4 shadow-inner">
+          <i data-lucide="book-open" class="w-7 h-7"></i>
         </div>
-        <h3 class="text-lg font-semibold text-slate-800 mb-1">No hay libros guardados</h3>
-        <p class="text-slate-500 text-sm max-w-md mb-4">Sube tu primer archivo PDF para comenzar a leerlo directamente en la plataforma.</p>
-        <button id="btnEmptyCreate" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow transition-colors inline-flex items-center space-x-2">
-          <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+        <h3 class="font-serif-book text-xl font-semibold text-[#1A1918] mb-1">Tu biblioteca está vacía</h3>
+        <p class="text-[#706E6B] text-sm max-w-sm mb-6">Sube tu primer archivo PDF para comenzar a leerlo directamente en la plataforma.</p>
+        <button id="btnEmptyCreate" class="px-5 py-2.5 bg-[#2D4B3E] hover:bg-[#1F352B] text-white font-medium text-sm rounded-xl shadow transition-all inline-flex items-center space-x-2">
+          <i data-lucide="plus" class="w-4 h-4"></i>
           <span>Cargar un PDF</span>
         </button>
       </div>
+
     </section>
 
     <!-- VISTA 2: FORMULARIO -->
     <section id="viewUpload" class="hidden max-w-2xl mx-auto">
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
-        <div class="border-b border-slate-100 pb-4">
+      <div class="bg-white border border-[#E8E3DA] rounded-3xl p-8 sm:p-10 book-card-shadow space-y-8">
+        
+        <div class="border-b border-[#F0ECE1] pb-5">
           <div class="flex items-center space-x-3 mb-1" id="formHeaderTitle">
-            <i data-lucide="upload-cloud" class="w-6 h-6 text-indigo-600"></i>
-            <h2 class="text-xl font-bold text-slate-900">Cargar Nuevo Libro PDF</h2>
+            <i data-lucide="file-plus-2" class="w-6 h-6 text-[#2D4B3E]"></i>
+            <h2 class="font-serif-book text-2xl font-semibold text-[#1A1918]">Cargar Nuevo Libro PDF</h2>
           </div>
-          <p class="text-sm text-slate-500" id="formHeaderSubtitle">Selecciona un archivo PDF de tu equipo e ingresa sus detalles.</p>
+          <p class="text-sm text-[#706E6B]" id="formHeaderSubtitle">Selecciona un archivo PDF de tu equipo e ingresa sus detalles.</p>
         </div>
 
-        <form id="bookForm" class="space-y-4">
+        <form id="bookForm" class="space-y-5">
           <input type="hidden" id="editingBookId" value="" />
           <input type="hidden" id="pdfDataUrl" value="" />
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Título *</label>
-              <input type="text" id="uploadTitle" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej: Cien Años de Soledad">
+              <label class="block text-xs font-semibold text-[#1A1918] uppercase tracking-wider mb-2">Título *</label>
+              <input type="text" id="uploadTitle" required class="w-full px-4 py-2.5 bg-[#FBF9F5] border border-[#E8E3DA] rounded-xl text-sm focus:ring-2 focus:ring-[#2D4B3E]/30 focus:border-[#2D4B3E] outline-none transition-all" placeholder="Ej: Cien Años de Soledad">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Autor *</label>
-              <input type="text" id="uploadAuthor" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej: Gabriel García Márquez">
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Género</label>
-              <input type="text" id="uploadGenre" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ej: Novela, Ficción">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">URL de Portada (Opcional)</label>
-              <input type="url" id="uploadCover" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="https://ejemplo.com/portada.jpg">
+              <label class="block text-xs font-semibold text-[#1A1918] uppercase tracking-wider mb-2">Autor *</label>
+              <input type="text" id="uploadAuthor" required class="w-full px-4 py-2.5 bg-[#FBF9F5] border border-[#E8E3DA] rounded-xl text-sm focus:ring-2 focus:ring-[#2D4B3E]/30 focus:border-[#2D4B3E] outline-none transition-all" placeholder="Ej: Gabriel García Márquez">
             </div>
           </div>
 
-          <div class="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-xl space-y-2">
-            <label class="block text-xs font-semibold text-slate-700">Seleccionar Documento PDF *</label>
-            <input type="file" id="uploadFile" accept=".pdf,application/pdf" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
-            <p id="pdfStatusText" class="text-xs text-slate-500 mt-1">Ningún archivo PDF seleccionado aún.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs font-semibold text-[#1A1918] uppercase tracking-wider mb-2">Género</label>
+              <input type="text" id="uploadGenre" class="w-full px-4 py-2.5 bg-[#FBF9F5] border border-[#E8E3DA] rounded-xl text-sm focus:ring-2 focus:ring-[#2D4B3E]/30 focus:border-[#2D4B3E] outline-none transition-all" placeholder="Ej: Novela, Ficción">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#1A1918] uppercase tracking-wider mb-2">URL de Portada (Opcional)</label>
+              <input type="url" id="uploadCover" class="w-full px-4 py-2.5 bg-[#FBF9F5] border border-[#E8E3DA] rounded-xl text-sm focus:ring-2 focus:ring-[#2D4B3E]/30 focus:border-[#2D4B3E] outline-none transition-all" placeholder="https://ejemplo.com/portada.jpg">
+            </div>
           </div>
 
-          <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-            <button type="button" id="btnCancelForm" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50">Cancelar</button>
-            <button type="submit" id="formSubmitBtn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow inline-flex items-center space-x-2">
+          <div class="p-6 bg-[#FBF9F5] border border-dashed border-[#DCD5C9] rounded-2xl space-y-2">
+            <label class="block text-xs font-semibold text-[#1A1918] uppercase tracking-wider">Documento PDF *</label>
+            <input type="file" id="uploadFile" accept=".pdf,application/pdf" class="block w-full text-xs text-[#706E6B] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#2D4B3E] file:text-white hover:file:bg-[#1F352B] cursor-pointer transition-all" />
+            <p id="pdfStatusText" class="text-xs text-[#706E6B] mt-2">Ningún archivo PDF seleccionado aún.</p>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-6 border-t border-[#F0ECE1]">
+            <button type="button" id="btnCancelForm" class="px-5 py-2.5 border border-[#E8E3DA] text-[#706E6B] hover:text-[#1A1918] rounded-xl text-sm font-medium hover:bg-[#F3EFE6] transition-all">Cancelar</button>
+            <button type="submit" id="formSubmitBtn" class="px-6 py-2.5 bg-[#2D4B3E] hover:bg-[#1F352B] text-white rounded-xl text-sm font-medium shadow inline-flex items-center space-x-2 transition-all">
               <i data-lucide="check" class="w-4 h-4"></i>
               <span>Guardar Libro</span>
             </button>
           </div>
         </form>
+
       </div>
     </section>
 
-    <!-- VISTA 3: VISOR PDF -->
+    <!-- VISTA 3: LECTOR PDF -->
     <section id="viewReader" class="hidden">
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[85vh]">
-        <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <button id="btnBackToCatalog" class="p-1.5 text-slate-500 hover:bg-slate-200 rounded-lg transition-colors" title="Volver al catálogo">
+      <div class="bg-white border border-[#E8E3DA] rounded-3xl book-card-shadow overflow-hidden flex flex-col h-[85vh]">
+        
+        <div class="p-4 sm:px-6 bg-[#FBF9F5] border-b border-[#E8E3DA] flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <button id="btnBackToCatalog" class="p-2 text-[#706E6B] hover:text-[#1A1918] hover:bg-[#E8E3DA]/60 rounded-xl transition-all" title="Volver al catálogo">
               <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </button>
             <div>
-              <h3 id="readerTitle" class="font-bold text-slate-800 text-base leading-tight">Título del PDF</h3>
-              <p id="readerAuthor" class="text-xs text-slate-500">Autor</p>
+              <h3 id="readerTitle" class="font-serif-book font-semibold text-[#1A1918] text-lg leading-tight">Título del PDF</h3>
+              <p id="readerAuthor" class="text-xs text-[#706E6B] font-medium">Autor</p>
             </div>
           </div>
 
-          <a id="readerDownloadBtn" download="documento.pdf" href="#" class="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-xs font-semibold flex items-center space-x-1">
+          <a id="readerDownloadBtn" download="documento.pdf" href="#" class="px-4 py-2 bg-[#2D4B3E]/10 text-[#2D4B3E] hover:bg-[#2D4B3E]/20 rounded-xl text-xs font-semibold flex items-center space-x-2 transition-all">
             <i data-lucide="download" class="w-4 h-4"></i>
             <span class="hidden sm:inline">Descargar PDF</span>
           </a>
         </div>
 
-        <div class="flex-1 bg-slate-100">
+        <div class="flex-1 bg-[#F3EFE6]">
           <iframe id="pdfViewer" class="w-full h-full border-0" src="about:blank"></iframe>
         </div>
+
       </div>
     </section>
 
   </main>
 
-  <!-- Modulo Principal JS -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
