@@ -1,19 +1,19 @@
 export class LibraryView {
   constructor() {
-    // Vistas
+    // Vistas principales
     this.viewCatalog = document.getElementById('viewCatalog');
     this.viewUpload = document.getElementById('viewUpload');
     this.viewReader = document.getElementById('viewReader');
 
-    // Navegación
+    // Botones de navegación
     this.navBtnCatalog = document.getElementById('navBtnCatalog');
     this.navBtnUpload = document.getElementById('navBtnUpload');
 
-    // Catálogo
+    // Componentes del catálogo
     this.booksGrid = document.getElementById('booksGrid');
     this.emptyState = document.getElementById('emptyCatalogState');
 
-    // Formulario
+    // Campos del formulario
     this.bookForm = document.getElementById('bookForm');
     this.editingBookId = document.getElementById('editingBookId');
     this.pdfDataUrl = document.getElementById('pdfDataUrl');
@@ -24,7 +24,7 @@ export class LibraryView {
     this.uploadFile = document.getElementById('uploadFile');
     this.pdfStatusText = document.getElementById('pdfStatusText');
 
-    // Lector
+    // Visor PDF
     this.readerTitle = document.getElementById('readerTitle');
     this.readerAuthor = document.getElementById('readerAuthor');
     this.readerDownloadBtn = document.getElementById('readerDownloadBtn');
@@ -36,15 +36,14 @@ export class LibraryView {
     this.viewUpload.classList.add('hidden');
     this.viewReader.classList.add('hidden');
 
-    this.navBtnCatalog.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100";
-    this.navBtnUpload.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100";
+    this.navBtnCatalog.className = "px-4 py-2.5 rounded-xl text-sm font-medium text-[#1A1918] hover:bg-[#E8E3DA]/60 transition-all";
+    this.navBtnUpload.className = "px-5 py-2.5 bg-[#2D4B3E] hover:bg-[#1F352B] text-[#FBF9F5] rounded-xl text-sm font-medium shadow-sm transition-all flex items-center space-x-2";
 
     if (viewName === 'catalog') {
       this.viewCatalog.classList.remove('hidden');
-      this.navBtnCatalog.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-50 text-indigo-700";
+      this.navBtnCatalog.className = "px-4 py-2.5 rounded-xl text-sm font-medium text-[#1A1918] bg-[#E8E3DA]/60 transition-all";
     } else if (viewName === 'upload') {
       this.viewUpload.classList.remove('hidden');
-      this.navBtnUpload.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-50 text-indigo-700";
     } else if (viewName === 'reader') {
       this.viewReader.classList.remove('hidden');
     }
@@ -66,37 +65,34 @@ export class LibraryView {
 
     books.forEach(book => {
       const card = document.createElement('div');
-      card.className = "bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between group cursor-pointer";
+      card.className = "bg-white rounded-2xl p-4 book-card-shadow transition-all duration-300 flex flex-col justify-between group cursor-pointer border border-[#E8E3DA]/70";
       card.onclick = () => onRead(book.id);
 
       card.innerHTML = `
         <div>
-          <div class="h-48 w-full bg-slate-100 overflow-hidden relative">
-            <img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=400&q=80'">
-            <span class="absolute top-2 right-2 bg-slate-900/70 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-sm">
+          <div class="h-56 w-full rounded-xl overflow-hidden relative shadow-inner bg-[#F3EFE6]">
+            <img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=400&q=80'">
+            <span class="absolute top-3 right-3 bg-[#1A1918]/80 text-[#FBF9F5] text-[10px] font-medium px-2.5 py-1 rounded-full backdrop-blur-md tracking-wider">
               ${book.genre || 'PDF'}
             </span>
           </div>
-          <div class="p-4">
-            <h3 class="font-bold text-slate-800 text-base line-clamp-1">${book.title}</h3>
-            <p class="text-xs text-slate-500 mb-2">${book.author}</p>
-            <span class="inline-flex items-center space-x-1 text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
-              <i data-lucide="file" class="w-3 h-3"></i>
-              <span>Documento PDF</span>
-            </span>
+
+          <div class="pt-4 px-1">
+            <h3 class="font-serif-book font-semibold text-[#1A1918] text-lg leading-snug line-clamp-1">${book.title}</h3>
+            <p class="text-xs text-[#706E6B] mt-1 font-medium">${book.author}</p>
           </div>
         </div>
 
-        <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between" onclick="event.stopPropagation()">
-          <button class="btn-read text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
-            <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+        <div class="pt-4 mt-3 border-t border-[#F0ECE1] flex items-center justify-between" onclick="event.stopPropagation()">
+          <button class="btn-read text-xs font-semibold text-[#2D4B3E] hover:text-[#1F352B] flex items-center space-x-1.5 transition-colors">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
             <span>Leer PDF</span>
           </button>
           <div class="flex items-center space-x-1">
-            <button class="btn-edit p-1 text-slate-400 hover:text-indigo-600 rounded" title="Editar">
-              <i data-lucide="edit-2" class="w-4 h-4"></i>
+            <button class="btn-edit p-1.5 text-[#706E6B] hover:text-[#2D4B3E] rounded-lg hover:bg-[#F3EFE6] transition-colors" title="Editar">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
             </button>
-            <button class="btn-delete p-1 text-slate-400 hover:text-red-600 rounded" title="Eliminar">
+            <button class="btn-delete p-1.5 text-[#706E6B] hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" title="Eliminar">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
@@ -118,11 +114,11 @@ export class LibraryView {
     this.pdfDataUrl.value = '';
     this.bookForm.reset();
     this.pdfStatusText.innerText = 'Ningún archivo PDF seleccionado aún.';
-    this.pdfStatusText.className = 'text-xs text-slate-500 mt-1';
+    this.pdfStatusText.className = 'text-xs text-[#706E6B] mt-2';
     
     document.getElementById('formHeaderTitle').innerHTML = `
-      <i data-lucide="upload-cloud" class="w-6 h-6 text-indigo-600"></i>
-      <h2 class="text-xl font-bold text-slate-900">Cargar Nuevo Libro PDF</h2>
+      <i data-lucide="file-plus-2" class="w-6 h-6 text-[#2D4B3E]"></i>
+      <h2 class="font-serif-book text-2xl font-semibold text-[#1A1918]">Cargar Nuevo Libro PDF</h2>
     `;
     document.getElementById('formHeaderSubtitle').innerText = 'Selecciona un archivo PDF de tu equipo e ingresa sus detalles.';
     document.getElementById('formSubmitBtn').innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Guardar Libro</span>`;
@@ -140,13 +136,13 @@ export class LibraryView {
     this.uploadFile.value = '';
 
     this.pdfStatusText.innerText = '✓ Documento PDF actual cargado. (Selecciona uno nuevo si deseas reemplazarlo)';
-    this.pdfStatusText.className = 'text-xs text-emerald-600 font-medium mt-1';
+    this.pdfStatusText.className = 'text-xs text-emerald-700 font-medium mt-2';
 
     document.getElementById('formHeaderTitle').innerHTML = `
-      <i data-lucide="edit-3" class="w-6 h-6 text-indigo-600"></i>
-      <h2 class="text-xl font-bold text-slate-900">Editar Libro</h2>
+      <i data-lucide="edit-3" class="w-6 h-6 text-[#2D4B3E]"></i>
+      <h2 class="font-serif-book text-2xl font-semibold text-[#1A1918]">Editar Libro</h2>
     `;
-    document.getElementById('formHeaderSubtitle').innerText = 'Modifica los datos o sube un nuevo PDF.';
+    document.getElementById('formHeaderSubtitle').innerText = 'Modifica los datos o sube un nuevo archivo PDF.';
     document.getElementById('formSubmitBtn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i><span>Actualizar Cambios</span>`;
 
     this.switchView('upload');
