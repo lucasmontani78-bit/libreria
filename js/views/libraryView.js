@@ -1,19 +1,26 @@
 export class LibraryView {
   constructor() {
     // Vistas principales
+    this.viewHome = document.getElementById('viewHome');
     this.viewCatalog = document.getElementById('viewCatalog');
     this.viewUpload = document.getElementById('viewUpload');
     this.viewReader = document.getElementById('viewReader');
 
-    // Botones de navegación
+    // Botones de navegación del Header
+    this.navBtnHome = document.getElementById('navBtnHome');
     this.navBtnCatalog = document.getElementById('navBtnCatalog');
     this.navBtnUpload = document.getElementById('navBtnUpload');
 
-    // Componentes del catálogo
+    // Componentes del Menú Principal (Dashboard)
+    this.statTotalBooks = document.getElementById('statTotalBooks');
+    this.recentBooksGrid = document.getElementById('recentBooksGrid');
+    this.recentBookSubtext = document.getElementById('recentBookSubtext');
+
+    // Componentes del Catálogo
     this.booksGrid = document.getElementById('booksGrid');
     this.emptyState = document.getElementById('emptyCatalogState');
 
-    // Campos del formulario
+    // Formulario
     this.bookForm = document.getElementById('bookForm');
     this.editingBookId = document.getElementById('editingBookId');
     this.pdfDataUrl = document.getElementById('pdfDataUrl');
@@ -32,21 +39,67 @@ export class LibraryView {
   }
 
   switchView(viewName) {
+    this.viewHome.classList.add('hidden');
     this.viewCatalog.classList.add('hidden');
     this.viewUpload.classList.add('hidden');
     this.viewReader.classList.add('hidden');
 
-    this.navBtnCatalog.className = "px-4 py-2.5 rounded-xl text-sm font-medium text-[#1A1918] hover:bg-[#E8E3DA]/60 transition-all";
-    this.navBtnUpload.className = "px-5 py-2.5 bg-[#2D4B3E] hover:bg-[#1F352B] text-[#FBF9F5] rounded-xl text-sm font-medium shadow-sm transition-all flex items-center space-x-2";
+    const defaultBtnClass = "px-4 py-2.5 rounded-xl text-sm font-medium text-[#706E6B] hover:text-[#1A1918] hover:bg-[#E8E3DA]/40 transition-all flex items-center space-x-2";
+    const activeBtnClass = "px-4 py-2.5 rounded-xl text-sm font-medium text-[#1A1918] bg-[#E8E3DA]/60 transition-all flex items-center space-x-2";
 
-    if (viewName === 'catalog') {
+    this.navBtnHome.className = defaultBtnClass;
+    this.navBtnCatalog.className = defaultBtnClass;
+
+    if (viewName === 'home') {
+      this.viewHome.classList.remove('hidden');
+      this.navBtnHome.className = activeBtnClass;
+    } else if (viewName === 'catalog') {
       this.viewCatalog.classList.remove('hidden');
-      this.navBtnCatalog.className = "px-4 py-2.5 rounded-xl text-sm font-medium text-[#1A1918] bg-[#E8E3DA]/60 transition-all";
+      this.navBtnCatalog.className = activeBtnClass;
     } else if (viewName === 'upload') {
       this.viewUpload.classList.remove('hidden');
     } else if (viewName === 'reader') {
       this.viewReader.classList.remove('hidden');
     }
+
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  renderDashboard(books, onRead) {
+    this.statTotalBooks.innerText = books.length;
+
+    if (books.length > 0) {
+      const lastBook = books[books.length - 1];
+      this.recentBookSubtext.innerText = `Continuar leyendo "${lastBook.title}"`;
+    } else {
+      this.recentBookSubtext.innerText = "Aún no tienes libros en tu colección.";
+    }
+
+    // Mostrar los últimos 4 libros añadidos
+    const recent = [...books].reverse().slice(0, 4);
+    this.recentBooksGrid.innerHTML = '';
+
+    if (recent.length === 0) {
+      this.recentBooksGrid.innerHTML = `
+        <p class="text-xs text-[#706E6B] col-span-full py-4 text-center">No hay libros añadidos recientemente.</p>
+      `;
+      return;
+    }
+
+    recent.forEach(book => {
+      const card = document.createElement('div');
+      card.className = "bg-white rounded-2xl p-3.5 book-card-shadow hover:border-[#2D4B3E]/40 transition-all cursor-pointer border border-[#E8E3DA]/70 flex space-x-3 items-center";
+      card.onclick = () => onRead(book.id);
+
+      card.innerHTML = `
+        <img src="${book.cover}" alt="${book.title}" class="w-12 h-16 object-cover rounded-lg shadow-sm bg-[#F3EFE6]" onerror="this.src='https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=400&q=80'">
+        <div class="overflow-hidden">
+          <h4 class="font-serif-book font-semibold text-[#1A1918] text-sm line-clamp-1">${book.title}</h4>
+          <p class="text-xs text-[#706E6B] mt-0.5 line-clamp-1">${book.author}</p>
+        </div>
+      `;
+      this.recentBooksGrid.appendChild(card);
+    });
 
     if (window.lucide) window.lucide.createIcons();
   }
